@@ -301,10 +301,3 @@ Paiement
   └── contrat: Contrat
 ```
 
----
-
-## Author
-
-**VotreNom VotrePrenom**  
-ENSET Mohammedia — 2026  
-GitHub: [VotreNom-VotrePrenom-Exam-JEE](https://github.com/VotreNom-VotrePrenom-Exam-JEE)
