@@ -49,4 +49,7 @@ public class PaiementServiceImpl implements PaiementService {
                 .mapToDouble(Paiement::getMontant)
                 .sum();
     }
+    public void deletePaiement(Long id) {
+        paiementRepository.deleteById(id);
+    }
 }

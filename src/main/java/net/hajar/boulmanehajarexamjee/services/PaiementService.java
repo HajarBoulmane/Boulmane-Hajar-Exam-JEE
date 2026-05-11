@@ -8,4 +8,5 @@ public interface PaiementService {
     PaiementDTO addPaiement(Long contratId, PaiementDTO dto);
     List<PaiementDTO> getPaiementsByContrat(Long contratId);
     double getTotalPaiementsByContrat(Long contratId);
+    void deletePaiement(Long id);
 }
