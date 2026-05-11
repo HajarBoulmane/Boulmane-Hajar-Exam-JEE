@@ -1,18 +1,19 @@
 package net.hajar.boulmanehajarexamjee;
-
 import net.hajar.boulmanehajarexamjee.entities.*;
 import net.hajar.boulmanehajarexamjee.enums.*;
 import net.hajar.boulmanehajarexamjee.repositories.*;
+import net.hajar.boulmanehajarexamjee.security.AppRole;
+import net.hajar.boulmanehajarexamjee.security.AppUser;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 import java.util.List;
 
 @SpringBootApplication
 public class BoulmaneHajarExamJeeApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(BoulmaneHajarExamJeeApplication.class, args);
     }
@@ -23,22 +24,42 @@ public class BoulmaneHajarExamJeeApplication {
             ContratAutoRepository autoRepo,
             ContratHabitationRepository habitRepo,
             ContratSanteRepository santeRepo,
-            PaiementRepository paiementRepo) {
-
+            PaiementRepository paiementRepo,
+            AppUserRepository userRepo,
+            AppRoleRepository roleRepo,
+            PasswordEncoder encoder) {
         return args -> {
 
-            // ── Clients ──────────────────────────────────
+            // Roles
+            AppRole adminRole = new AppRole("ROLE_ADMIN");
+            AppRole employeRole = new AppRole("ROLE_EMPLOYE");
+            AppRole clientRole = new AppRole("ROLE_CLIENT");
+            roleRepo.saveAll(List.of(adminRole, employeRole, clientRole));
+
+            // Users
+            userRepo.save(AppUser.builder()
+                    .username("admin")
+                    .password(encoder.encode("1234"))
+                    .roles(List.of(adminRole)).build());
+            userRepo.save(AppUser.builder()
+                    .username("employe1")
+                    .password(encoder.encode("1234"))
+                    .roles(List.of(employeRole)).build());
+            userRepo.save(AppUser.builder()
+                    .username("client1")
+                    .password(encoder.encode("1234"))
+                    .roles(List.of(clientRole)).build());
+
+            // Clients
             Client c1 = new Client();
             c1.setNom("Ahmed Benali");
             c1.setEmail("ahmed@mail.com");
-
             Client c2 = new Client();
             c2.setNom("Sara Alami");
             c2.setEmail("sara@mail.com");
-
             clientRepo.saveAll(List.of(c1, c2));
 
-            // ── Contrat Auto pour c1 ─────────────────────
+            // Contrat Auto
             ContratAuto auto = new ContratAuto();
             auto.setClient(c1);
             auto.setDateSouscription(LocalDate.of(2024, 1, 15));
@@ -52,7 +73,7 @@ public class BoulmaneHajarExamJeeApplication {
             auto.setModeleVehicule("Corolla");
             autoRepo.save(auto);
 
-            // ── Contrat Habitation pour c1 ───────────────
+            // Contrat Habitation
             ContratHabitation hab = new ContratHabitation();
             hab.setClient(c1);
             hab.setDateSouscription(LocalDate.of(2024, 3, 1));
@@ -65,7 +86,7 @@ public class BoulmaneHajarExamJeeApplication {
             hab.setSuperficie(85.0);
             habitRepo.save(hab);
 
-            // ── Contrat Santé pour c2 ────────────────────
+            // Contrat Sante
             ContratSante sante = new ContratSante();
             sante.setClient(c2);
             sante.setDateSouscription(LocalDate.of(2024, 5, 10));
@@ -77,28 +98,25 @@ public class BoulmaneHajarExamJeeApplication {
             sante.setNombrePersonnesCouvertes(4);
             santeRepo.save(sante);
 
-            // ── Paiements ────────────────────────────────
+            // Paiements
             Paiement p1 = new Paiement();
             p1.setContrat(auto);
             p1.setDate(LocalDate.of(2024, 2, 1));
             p1.setMontant(100.0);
             p1.setTypePaiement(TypePaiement.MENSUALITE);
-
             Paiement p2 = new Paiement();
             p2.setContrat(auto);
             p2.setDate(LocalDate.of(2024, 3, 1));
             p2.setMontant(100.0);
             p2.setTypePaiement(TypePaiement.MENSUALITE);
-
             Paiement p3 = new Paiement();
             p3.setContrat(sante);
             p3.setDate(LocalDate.of(2024, 6, 1));
             p3.setMontant(2400.0);
             p3.setTypePaiement(TypePaiement.PAIEMENT_ANNUEL);
-
             paiementRepo.saveAll(List.of(p1, p2, p3));
 
-            System.out.println("✅ Données insérées avec succès !");
+            System.out.println("Données insérées avec succès !");
         };
     }
 }
